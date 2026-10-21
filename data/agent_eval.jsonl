@@ -1,0 +1,6 @@
+{"question": "能查一下 B555555555 的材质吗？", "answer": {"action": "get_product_details", "arguments": {"product_id": "B555555555"}}}
+{"question": "编号 B666666666 的产品叫什么？", "answer": {"action": "get_product_details", "arguments": {"product_id": "B666666666"}}}
+{"question": "想找紫色的仿真花环。", "answer": {"action": "search_products", "arguments": {"requirement": "紫色的仿真花环"}}}
+{"question": "帮忙挑几款适合客厅的花束。", "answer": {"action": "search_products", "arguments": {"requirement": "适合客厅的花束"}}}
+{"question": "请查那一款的颜色。", "answer": {"action": "clarify", "message": "请提供你要查询的产品编号。"}}
+{"question": "它卖多少钱？", "answer": {"action": "clarify", "message": "请提供你要查询的产品编号。"}}

@@ -1,0 +1,12 @@
+{"question": "查一下 B111111111 的颜色。", "answer": {"action": "get_product_details", "arguments": {"product_id": "B111111111"}}}
+{"question": "B222222222 是什么材质？", "answer": {"action": "get_product_details", "arguments": {"product_id": "B222222222"}}}
+{"question": "请给我 B333333333 的详细资料。", "answer": {"action": "get_product_details", "arguments": {"product_id": "B333333333"}}}
+{"question": "查询编号 B444444444 的价格信息。", "answer": {"action": "get_product_details", "arguments": {"product_id": "B444444444"}}}
+{"question": "找几款白色仿真玫瑰。", "answer": {"action": "search_products", "arguments": {"requirement": "白色仿真玫瑰"}}}
+{"question": "我想要简约风格的花束。", "answer": {"action": "search_products", "arguments": {"requirement": "简约风格的花束"}}}
+{"question": "推荐适合婚礼装饰的花环。", "answer": {"action": "search_products", "arguments": {"requirement": "适合婚礼装饰的花环"}}}
+{"question": "有没有高度较低的粉色假花？", "answer": {"action": "search_products", "arguments": {"requirement": "高度较低的粉色假花"}}}
+{"question": "那件产品是什么颜色？", "answer": {"action": "clarify", "message": "请提供你要查询的产品编号。"}}
+{"question": "帮我看看这款花束的材质。", "answer": {"action": "clarify", "message": "请提供你要查询的产品编号。"}}
+{"question": "这个产品的价格是多少？", "answer": {"action": "clarify", "message": "请提供你要查询的产品编号。"}}
+{"question": "查询刚才说的那款花。", "answer": {"action": "clarify", "message": "请提供你要查询的产品编号。"}}
