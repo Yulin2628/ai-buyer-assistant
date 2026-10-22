@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "source": "synthetic_scenario_not_supplier_quotes",
+  "suppliers": [
+    {
+      "id": "fast",
+      "currency": "GBP",
+      "shipping": "8.00"
+    },
+    {
+      "id": "mid",
+      "currency": "GBP",
+      "shipping": "10.00"
+    },
+    {
+      "id": "slow",
+      "currency": "GBP",
+      "shipping": "18.00"
+    },
+    {
+      "id": "cheap_stems",
+      "currency": "GBP",
+      "shipping": "25.00"
+    },
+    {
+      "id": "cheap_bouquets",
+      "currency": "GBP",
+      "shipping": "25.00"
+    }
+  ],
+  "offers": [
+    {
+      "id": "fast-stem",
+      "supplier_id": "fast",
+      "product_id": "PINK-STEM",
+      "attributes": {
+        "color": "pink",
+        "form": "stem"
+      },
+      "currency": "GBP",
+      "pack_price": "9.00",
+      "pack_size": 6,
+      "min_packs": 1,
+      "stock_packs": 20,
+      "lead_days": 2,
+      "quoted_on": "2026-10-01",
+      "valid_until": "2026-11-30",
+      "height_cm": 40
+    },
+    {
+      "id": "fast-bouquet",
+      "supplier_id": "fast",
+      "product_id": "PINK-BOUQUET",
+      "attributes": {
+        "color": "pink",
+        "form": "bouquet"
+      },
+      "currency": "GBP",
+      "pack_price": "12.00",
+      "pack_size": 3,
+      "min_packs": 1,
+      "stock_packs": 20,
+      "lead_days": 2,
+      "quoted_on": "2026-10-01",
+      "valid_until": "2026-11-30",
+      "height_cm": 40
+    },
+    {
+      "id": "mid-stem",
+      "supplier_id": "mid",
+      "product_id": "PINK-STEM",
+      "attributes": {
+        "color": "pink",
+        "form": "stem"
+      },
+      "currency": "GBP",
+      "pack_price": "7.50",
+      "pack_size": 6,
+      "min_packs": 1,
+      "stock_packs": 20,
+      "lead_days": 4,
+      "quoted_on": "2026-10-01",
+      "valid_until": "2026-11-30",
+      "height_cm": 40
+    },
+    {
+      "id": "mid-bouquet",
+      "supplier_id": "mid",
+      "product_id": "PINK-BOUQUET",
+      "attributes": {
+        "color": "pink",
+        "form": "bouquet"
+      },
+      "currency": "GBP",
+      "pack_price": "10.50",
+      "pack_size": 3,
+      "min_packs": 1,
+      "stock_packs": 20,
+      "lead_days": 4,
+      "quoted_on": "2026-10-01",
+      "valid_until": "2026-11-30",
+      "height_cm": 40
+    },
+    {
+      "id": "slow-stem",
+      "supplier_id": "slow",
+      "product_id": "PINK-STEM",
+      "attributes": {
+        "color": "pink",
+        "form": "stem"
+      },
+      "currency": "GBP",
+      "pack_price": "6.00",
+      "pack_size": 6,
+      "min_packs": 1,
+      "stock_packs": 20,
+      "lead_days": 7,
+      "quoted_on": "2026-10-01",
+      "valid_until": "2026-11-30",
+      "height_cm": 40
+    },
+    {
+      "id": "slow-bouquet",
+      "supplier_id": "slow",
+      "product_id": "PINK-BOUQUET",
+      "attributes": {
+        "color": "pink",
+        "form": "bouquet"
+      },
+      "currency": "GBP",
+      "pack_price": "9.00",
+      "pack_size": 3,
+      "min_packs": 1,
+      "stock_packs": 20,
+      "lead_days": 7,
+      "quoted_on": "2026-10-01",
+      "valid_until": "2026-11-30",
+      "height_cm": 40
+    },
+    {
+      "id": "cheap-stem",
+      "supplier_id": "cheap_stems",
+      "product_id": "PINK-STEM",
+      "attributes": {
+        "color": "pink",
+        "form": "stem"
+      },
+      "currency": "GBP",
+      "pack_price": "5.50",
+      "pack_size": 6,
+      "min_packs": 1,
+      "stock_packs": 20,
+      "lead_days": 7,
+      "quoted_on": "2026-10-01",
+      "valid_until": "2026-11-30",
+      "height_cm": 40
+    },
+    {
+      "id": "cheap-bouquet",
+      "supplier_id": "cheap_bouquets",
+      "product_id": "PINK-BOUQUET",
+      "attributes": {
+        "color": "pink",
+        "form": "bouquet"
+      },
+      "currency": "GBP",
+      "pack_price": "8.50",
+      "pack_size": 3,
+      "min_packs": 1,
+      "stock_packs": 20,
+      "lead_days": 7,
+      "quoted_on": "2026-10-01",
+      "valid_until": "2026-11-30",
+      "height_cm": 40
+    },
+    {
+      "id": "expired",
+      "supplier_id": "fast",
+      "product_id": "PINK-STEM",
+      "attributes": {
+        "color": "pink",
+        "form": "stem"
+      },
+      "currency": "GBP",
+      "pack_price": "0.01",
+      "pack_size": 6,
+      "min_packs": 1,
+      "stock_packs": 20,
+      "lead_days": 1,
+      "quoted_on": "2026-10-01",
+      "valid_until": "2026-10-20",
+      "height_cm": 40
+    },
+    {
+      "id": "unknown-stock",
+      "supplier_id": "fast",
+      "product_id": "PINK-BOUQUET",
+      "attributes": {
+        "color": "pink",
+        "form": "bouquet"
+      },
+      "currency": "GBP",
+      "pack_price": "0.01",
+      "pack_size": 3,
+      "min_packs": 1,
+      "stock_packs": null,
+      "lead_days": 1,
+      "quoted_on": "2026-10-01",
+      "valid_until": "2026-11-30",
+      "height_cm": 40
+    },
+    {
+      "id": "other-currency",
+      "supplier_id": "mid",
+      "product_id": "PINK-STEM",
+      "attributes": {
+        "color": "pink",
+        "form": "stem"
+      },
+      "currency": "USD",
+      "pack_price": "0.01",
+      "pack_size": 6,
+      "min_packs": 1,
+      "stock_packs": 20,
+      "lead_days": 1,
+      "quoted_on": "2026-10-01",
+      "valid_until": "2026-11-30",
+      "height_cm": 40
+    },
+    {
+      "id": "tall",
+      "supplier_id": "mid",
+      "product_id": "PINK-STEM",
+      "attributes": {
+        "color": "pink",
+        "form": "stem"
+      },
+      "currency": "GBP",
+      "pack_price": "0.01",
+      "pack_size": 6,
+      "min_packs": 1,
+      "stock_packs": 20,
+      "lead_days": 1,
+      "quoted_on": "2026-10-01",
+      "valid_until": "2026-11-30",
+      "height_cm": 100
+    }
+  ]
+}

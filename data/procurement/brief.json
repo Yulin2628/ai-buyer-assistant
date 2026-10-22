@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "currency": "GBP",
+  "budget": "120.00",
+  "deadline_days": 7,
+  "lines": [
+    {
+      "id": "stems",
+      "quantity": 24,
+      "attributes": {
+        "color": "pink",
+        "form": "stem"
+      },
+      "max_height_cm": 60
+    },
+    {
+      "id": "bouquets",
+      "quantity": 12,
+      "attributes": {
+        "color": "pink",
+        "form": "bouquet"
+      },
+      "max_height_cm": 60
+    }
+  ]
+}

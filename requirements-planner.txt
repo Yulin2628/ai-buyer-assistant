@@ -1,0 +1,2 @@
+# Integer procurement planning; neural search remains optional.
+scipy>=1.11,<2

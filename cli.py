@@ -24,12 +24,30 @@ def parser():
     commands.add_parser("details").add_argument("product_id")
     chat = commands.add_parser("chat", help="Local LLM with validated catalogue tools")
     chat.add_argument("--adapter", type=Path)
+    for command in ("plan", "frontier"):
+        order = commands.add_parser(command, help="Plan a quantity-aware order from normalized quotes")
+        order.add_argument("--brief", type=Path, required=True)
+        order.add_argument("--quotes", type=Path, default=Path("data/procurement/quotes.json"))
+        order.add_argument("--as-of", help="Explicit YYYY-MM-DD date for offline scenario replay")
+        if command == "plan":
+            order.add_argument("--database", type=Path)
+            order.add_argument("--idempotency-key")
     return result
 
 
 def main(argv=None):
     args = parser().parse_args(argv)
     try:
+        if args.command in ("plan", "frontier"):
+            from procurement.application import Planner, load_json
+            if args.command == "plan" and bool(args.database) != bool(args.idempotency_key):
+                raise ValueError("--database and --idempotency-key must be supplied together")
+            planner = Planner(args.quotes, getattr(args, "database", None))
+            brief = load_json(args.brief)
+            output = (planner.plan(brief, args.as_of, args.idempotency_key) if args.command == "plan"
+                      else planner.alternatives(brief, args.as_of))
+            print(json.dumps(output, ensure_ascii=False, indent=2))
+            return 0
         service = BuyerService(args.catalog, args.demo, args.backend, args.rerank)
         if args.command == "search":
             filters = {key: getattr(args, key) for key in

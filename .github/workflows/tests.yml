@@ -13,3 +13,17 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: python -m unittest discover -s tests -v
       - run: python cli.py --demo search '浅粉色简约花束' --color 浅粉色 --form 花束 --currency GBP --max-price 10 --max-height-cm 40
+  planner:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -r requirements-planner.txt
+      - run: python -m unittest discover -s tests -v
+      - run: python verify_planner_results.py
+      - run: python cli.py plan --brief data/procurement/brief.json --as-of 2026-10-22 > plan.json
