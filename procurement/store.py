@@ -29,9 +29,6 @@ class PlanStore:
                     input_sha256 TEXT NOT NULL, body_json TEXT NOT NULL, body_sha256 TEXT NOT NULL,
                     status TEXT NOT NULL CHECK(status IN ('draft','approved','rejected')),
                     version INTEGER NOT NULL, created_at TEXT NOT NULL);
-                CREATE TABLE IF NOT EXISTS events (
-                    sequence INTEGER PRIMARY KEY AUTOINCREMENT, plan_id TEXT NOT NULL REFERENCES plans(id),
-                    event_json TEXT NOT NULL);
             """)
 
     @contextmanager
@@ -46,22 +43,20 @@ class PlanStore:
             connection.close()
 
     @staticmethod
-    def unpack(row, connection):
+    def unpack(row):
         body = json.loads(row["body_json"])
         if digest(body) != row["body_sha256"]:
             raise ConflictError("Stored plan body failed its integrity check")
-        events = [json.loads(event[0]) for event in connection.execute(
-            "SELECT event_json FROM events WHERE plan_id=? ORDER BY sequence", (row["id"],))]
         return {"id": row["id"], "status": row["status"], "version": row["version"],
                 "body_sha256": row["body_sha256"], "created_at": row["created_at"],
-                "body": body, "events": events}
+                "body": body}
 
     def get(self, plan_id):
         with self.connect() as connection:
             row = connection.execute("SELECT * FROM plans WHERE id=?", (plan_id,)).fetchone()
             if row is None:
                 raise KeyError("Plan not found")
-            return self.unpack(row, connection)
+            return self.unpack(row)
 
     def existing(self, key, inputs):
         text(key, "idempotency key")
@@ -71,7 +66,7 @@ class PlanStore:
                 return None
             if row["input_sha256"] != digest(inputs):
                 raise ConflictError("Idempotency key was already used for different inputs")
-            return self.unpack(row, connection)
+            return self.unpack(row)
 
     def create(self, key, brief, snapshot, plan, as_of):
         if plan.get("status") != "optimal":
@@ -86,12 +81,10 @@ class PlanStore:
             if prior:
                 if prior["input_sha256"] != digest(inputs):
                     raise ConflictError("Idempotency key was already used for different inputs")
-                return self.unpack(prior, connection)
+                return self.unpack(prior)
             plan_id, stamp = uuid.uuid4().hex, now()
             connection.execute("INSERT INTO plans VALUES (?,?,?,?,?,'draft',1,?)",
                                (plan_id, key, digest(inputs), canonical(body), digest(body), stamp))
-            event = {"action": "created", "version": 1, "at": stamp, "body_sha256": digest(body)}
-            connection.execute("INSERT INTO events(plan_id,event_json) VALUES (?,?)", (plan_id, canonical(event)))
         return self.get(plan_id)
 
     def review(self, plan_id, action, expected_version, current_quotes, as_of):
@@ -103,7 +96,7 @@ class PlanStore:
             row = connection.execute("SELECT * FROM plans WHERE id=?", (plan_id,)).fetchone()
             if row is None:
                 raise KeyError("Plan not found")
-            record = self.unpack(row, connection)
+            record = self.unpack(row)
             if row["version"] != expected_version or row["status"] != "draft":
                 raise ConflictError("Stale version or plan has already been reviewed")
             if action == "approve":
@@ -117,7 +110,4 @@ class PlanStore:
             status, version = ("approved" if action == "approve" else "rejected"), expected_version + 1
             connection.execute("UPDATE plans SET status=?,version=? WHERE id=? AND version=?",
                                (status, version, plan_id, expected_version))
-            event = {"action": action, "version": version, "at": now(),
-                     "checked_as_of": as_of, "body_sha256": row["body_sha256"]}
-            connection.execute("INSERT INTO events(plan_id,event_json) VALUES (?,?)", (plan_id, canonical(event)))
         return self.get(plan_id)

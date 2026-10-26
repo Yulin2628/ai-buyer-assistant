@@ -8,11 +8,6 @@ __pycache__/
 models/
 data/public_products_raw.jsonl
 results/*
-!results/planner_evaluation.json
-!results/planner_scaling.json
-!results/decision_frontier.png
-!results/planner_checks.png
-!results/EVALUATION.md
 *.log
 *.zip
 local/

@@ -163,7 +163,7 @@ def generated_cases(seed=20261022, count=80):
 
 def main():
     parser = argparse.ArgumentParser(__doc__)
-    parser.add_argument("--output", type=Path, default=ROOT / "results/planner_evaluation.json")
+    parser.add_argument("--output", type=Path, default=ROOT / "local/planner_evaluation.json")
     args = parser.parse_args()
     import scipy
     cases = generated_cases()

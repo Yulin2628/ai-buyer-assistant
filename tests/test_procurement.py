@@ -148,11 +148,25 @@ class WorkflowChecks(unittest.TestCase):
     def create(self, key="test"):
         return self.planner.plan(self.brief, AS_OF, key)["record"]
 
+    def test_single_table_storage_can_read_existing_drafts(self):
+        record = self.create()
+        with self.planner.store.connect() as connection:
+            tables = {row[0] for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'")}
+            self.assertEqual(tables, {"plans"})
+            # Earlier databases may still contain an audit table; it is unused.
+            connection.execute("CREATE TABLE events (event_json TEXT)")
+            connection.execute("INSERT INTO events VALUES ('legacy event')")
+        reopened = Planner(self.quotes_path, self.planner.store.path)
+        self.assertEqual(reopened.store.get(record["id"]), record)
+        self.assertEqual(reopened.review(record["id"], "approve", 1, AS_OF)["status"], "approved")
+        with reopened.store.connect() as connection:
+            self.assertEqual(connection.execute("SELECT COUNT(*) FROM events").fetchone()[0], 1)
+
     def test_retry_is_idempotent_but_conflicting_input_is_rejected(self):
         first = self.create()
         retry = self.create()
         self.assertEqual(first["id"], retry["id"])
-        self.assertEqual(len(retry["events"]), 1)
         self.brief["budget"] = "121.00"
         with self.assertRaises(ConflictError):
             self.create()
@@ -177,7 +191,7 @@ class WorkflowChecks(unittest.TestCase):
             outcomes = list(executor.map(approve, range(2)))
         self.assertCountEqual(outcomes, ["approved", "conflict"])
         final = self.planner.store.get(record["id"])
-        self.assertEqual((final["version"], len(final["events"])), (2, 2))
+        self.assertEqual(final["version"], 2)
         self.assertEqual(final["body_sha256"], record["body_sha256"])
 
     def test_changed_quotes_expiry_or_delayed_review_require_replanning(self):
@@ -192,7 +206,7 @@ class WorkflowChecks(unittest.TestCase):
             self.planner.review(record["id"], "approve", 1, AS_OF)
         self.assertEqual(self.planner.store.get(record["id"])["status"], "draft")
 
-    def test_rejection_is_terminal_and_audited(self):
+    def test_rejection_is_terminal(self):
         record = self.create()
         final = self.planner.review(record["id"], "reject", 1, AS_OF)
         self.assertEqual(final["status"], "rejected")

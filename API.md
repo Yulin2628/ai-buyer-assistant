@@ -11,7 +11,7 @@ The API listens on `127.0.0.1` only. Its example quotes are synthetic and valid 
 | --- | --- | --- |
 | GET | `/health` | Version and health information |
 | POST | `/plans` | Validate a brief, optimize, and persist a verified optimal draft |
-| GET | `/plans/{id}` | Return snapshots, status, version and review events |
+| GET | `/plans/{id}` | Return snapshots, status and version |
 | POST | `/plans/{id}/review` | Approve or reject the expected draft version |
 
 Requests and responses use JSON. `POST /plans` requires `Idempotency-Key`. The body is `{"brief": {...}}`; use the brief in `data/procurement/brief.json` as a complete example. To construct a request file:
@@ -38,6 +38,6 @@ Approval changes local state to `approved`, version 2; it does not place an orde
 | 409 | Idempotency conflict, stale version, changed quotes or stale approval |
 | 413 | Request body outside the supported size |
 | 422 | No persistable optimal plan; inspect `plan.status` and its reasons |
-| 503 | Planner admission or storage temporarily unavailable |
+| 503 | Storage or request temporarily unavailable |
 
-The API is unauthenticated and intended for local demonstration. See [the design](DESIGN.md) for model assumptions, transaction behavior and limits.
+The API is unauthenticated and intended for local demonstration. Requests are processed sequentially. SQLite transactions protect idempotent creation and version-checked reviews, including access from other processes. There is no audit event log.

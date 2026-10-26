@@ -25,5 +25,5 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: python -m pip install -r requirements-planner.txt
       - run: python -m unittest discover -s tests -v
-      - run: python verify_planner_results.py
+      - run: python evaluate_planner.py --output local/planner_evaluation.json
       - run: python cli.py plan --brief data/procurement/brief.json --as-of 2026-10-22 > plan.json

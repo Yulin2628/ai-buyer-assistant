@@ -1,13 +1,5 @@
 # Validation
 
-## Procurement upgrade, 22 October 2026
-
-The full suite passed 28 tests with the planner dependencies installed, including loopback HTTP calls, competing SQLite writers, quote changes, expiry, delayed review and exact order verification. The dependency-free catalogue job remains separate and skips the SciPy-dependent cases.
-
-The saved planner study agrees with independent exhaustive enumeration on 80 small synthetic cases (26 feasible, 54 infeasible), with 320 transformed cases also verified. Three larger synthetic quote books have retained timings, solver statuses and independently checked allocations. See [the complete evaluation](results/EVALUATION.md) and run `python verify_planner_results.py` to check the stored evidence without downloading models.
-
-No neural model was retrained or newly evaluated in this upgrade. Algorithm agreement and workflow tests are separate from the earlier tool-routing results below.
-
 ## Earlier neural and catalogue smoke checks
 
 Checked locally on 21 October 2026 with Python 3.12.7.

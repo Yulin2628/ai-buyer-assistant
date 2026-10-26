@@ -1,10 +1,9 @@
 """Loopback-only prototype API. Approved drafts are never sent to suppliers."""
 import argparse
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from pathlib import Path
 import sqlite3
-import threading
 
 from procurement.application import Planner
 from procurement.schema import InputError, canonical, fields, text
@@ -14,7 +13,6 @@ from procurement.store import ConflictError
 def make_server(planner, port=0):
     if planner.store is None:
         raise InputError("The HTTP review workflow requires a database")
-    admission = threading.BoundedSemaphore(1)
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
             pass
@@ -41,9 +39,6 @@ def make_server(planner, port=0):
                 self.respond(409, {"error": str(error)})
 
         def do_POST(self):
-            if not admission.acquire(blocking=False):
-                self.respond(503, {"error": "Planner busy; retry with the same idempotency key"})
-                return
             try:
                 if self.headers.get("Content-Type", "").split(";")[0] != "application/json":
                     raise InputError("Content-Type must be application/json")
@@ -78,9 +73,7 @@ def make_server(planner, port=0):
                 self.respond(404, {"error": "Plan not found"})
             except (sqlite3.OperationalError, TimeoutError):
                 self.respond(503, {"error": "Storage or request temporarily unavailable"})
-            finally:
-                admission.release()
-    return ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    return HTTPServer(("127.0.0.1", port), Handler)
 
 
 def main():

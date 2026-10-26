@@ -24,39 +24,29 @@ The supplied scenario requires 24 stems and 12 bouquets. Its non-dominated alter
 
 These are synthetic quotes, not supplier offers. In this constructed example, cheapest-unit greedy costs GBP 106 after shipping, compared with GBP 78 for the optimized order. That difference is an illustration of coupled shipping costs, not measured commercial savings.
 
-![Order cost and delivery alternatives](results/decision_frontier.png)
-
-[Evaluation and raw results](results/EVALUATION.md) · [Optimization and workflow design](DESIGN.md) · [Local API](API.md) · [CV wording](PORTFOLIO.md)
-
 ## Review workflow and API
 
 ```bash
 python -m procurement.api --quotes data/procurement/quotes.json --database local/plans.sqlite --port 8765
 ```
 
-The loopback API creates drafts, reads records and approves/rejects an expected version. SQLite transactions and idempotency keys prevent duplicate records and conflicting reviews. The stored body includes the original brief, quote snapshot, exact totals and review events. Approval rechecks quote validity, snapshot identity and the remaining original delivery deadline. It never places an order or reserves inventory.
+The loopback API creates drafts, reads records and approves/rejects an expected version. SQLite transactions and idempotency keys prevent duplicate records and conflicting reviews. The stored body includes the original brief, quote snapshot and exact totals. Approval rechecks quote validity, snapshot identity and the remaining original delivery deadline. It never places an order or reserves inventory.
 
 For offline draft creation, add `--database local/plans.sqlite --idempotency-key example-1` to the plan command. `--as-of` explicitly replays a dated scenario; HTTP uses its current UTC date and rejects request date overrides. This is a local, unauthenticated prototype rather than a deployed purchasing service.
 
 ## Algorithm and workflow checks
 
-| Check | Observed result |
-| --- | --- |
-| Independent exhaustive reference | 80/80 cases agree: 26 feasible, 54 infeasible |
-| Budget, deadline, stock and ordering transformations | 320/320 pass |
-| Regression suite with planner dependencies | 28 tests pass, including HTTP and concurrent SQLite review |
-| Largest synthetic timing scenario | 500 offers, 12 lines, 3,520 variables; median 214 ms over three local runs |
-
-The small reference suite enumerates 2,361 allocations in total. It validates the constrained algorithm on those fixtures, not general recommendation accuracy. Larger scenario optimality is reported by HiGHS; they are not exhaustively enumerated. Timings include model construction and independent checking, but exclude HTTP, persistence and file IO.
+The independent exhaustive reference checks 80 small synthetic cases and 320 budget,
+deadline, stock and ordering transformations. Regression tests cover concurrent SQLite
+reviews, changed quotes, quote expiry and missed delivery deadlines.
 
 ```bash
 python -m unittest discover -s tests -v
-python verify_planner_results.py
-python evaluate_planner.py
-python benchmark_planner.py
+python evaluate_planner.py --output local/planner_evaluation.json
 ```
 
-The verifier recalculates the saved small-case references and accounting. The two evaluators generate new local results. To rebuild figures, install `requirements-report.txt` and run `python make_planner_report.py`.
+The evaluator regenerates its fixtures and fails on disagreement. Its generated JSON
+is a local diagnostic, not a tracked artifact. See [API usage](API.md).
 
 ## Catalogue search
 
@@ -108,6 +98,19 @@ python cli.py --demo chat --adapter models/agent_lora
 
 Training requires CUDA and runs one epoch with rank-4 LoRA on the query and value projections. Prompt tokens are masked from the loss. The saved adapter is loaded explicitly for evaluation and chat. Evaluation reports valid-decision rate, action accuracy and exact argument accuracy without executing tools. Search argument matching is strict string matching; semantically equivalent rewrites can score as incorrect.
 
+## Minimal backend
+
+The backend has six small modules: `api.py` handles HTTP, `application.py` connects
+file input and planning, `schema.py` validates inputs, `solver.py` builds the integer
+model, `verify.py` independently checks orders, and `store.py` handles SQLite drafts.
+The local HTTP server processes one request at a time; SQLite transactions also
+protect drafts when accessed by multiple processes. There is no separate worker,
+audit-event table, report generator or scaling benchmark.
+
+Existing plan databases remain readable; an old `events` table, if present, is no
+longer used. The API returns the draft body, status and version without an event log.
+Neural search, Qwen inference, tool calling and fine-tuning are unchanged.
+
 ## Layout
 
 | Files | Purpose |
@@ -119,8 +122,7 @@ Training requires CUDA and runs one epoch with rank-4 LoRA on the query and valu
 | `main.py`, `rag.py` | Original structured-filter and RAG demonstrations |
 | `tests/` | Offline regression tests |
 | `procurement/` | Quote validation, integer planning, exact accounting, SQLite review and HTTP API |
-| `evaluate_planner.py`, `benchmark_planner.py` | Enumerated reference checks and synthetic scaling scenarios |
-| `results/EVALUATION.md` | Complete procurement measurements and limits |
+| `evaluate_planner.py` | Independent exhaustive reference and 320 constraint transformations |
 
 Custom catalogues can be passed with `--catalog path.jsonl`. Each record needs `parent_asin` (or `id`) and a title or name; optional fields include features, description, details and price. Per-item budget filtering requires explicit `currency` and `price_basis: "per_item"`. Heights must be numeric `height_cm`; dimensions embedded in free text are not inferred.
 
